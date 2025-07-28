@@ -12,3 +12,9 @@ void UpdateButtonGroup(string name, string &names[], int length,color beforeColo
         }
     }
 }
+void ChangeButtonStates(string name,bool isEnable){
+    if(ObjectGetInteger(0, name, OBJPROP_TYPE) == OBJ_BUTTON){
+        ObjectSetInteger(0,name,OBJPROP_STATE,isEnable);
+        
+    }
+}

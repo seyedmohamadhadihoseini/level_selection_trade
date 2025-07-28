@@ -1,0 +1,2 @@
+#include  "profit.mq5";
+

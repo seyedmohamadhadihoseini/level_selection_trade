@@ -15,6 +15,8 @@ public:
     void Sort();
     int LevelTouchedIndex();
     int LevelNextIndex(int currentIndex, int stepFromHere);
+    int FindNearestLevel(bool isBuyLevel,double price);
+    double FindNearestLevelDistance(double price);
     int GetIndex(double price);
 };
 
@@ -31,7 +33,7 @@ int Levels::DataLength()
     int count = 0;
     for (int i = 0; i < length; i++)
     {
-        if (!arr[i].isFreeForArr)
+        if (!(arr[i].isFreeForArr))
         {
             count++;
         }
@@ -72,7 +74,6 @@ void Levels::Remove(string name)
         if (arr[i].name == name)
         {
             arr[i].Remove();
-            return;
         }
     }
 }
@@ -129,6 +130,11 @@ int Levels::LevelNextIndex(int currentIndex, int stepFromHere)
             return i;
         }
         i += stepFromHere > 0 ? 1 : -1;
+        if(i == -1){
+
+            Print("levels are not complete by user ");
+            ExpertRemove();
+        }
         if (!(arr[i].isFreeForArr))
         {
             count++;
@@ -147,4 +153,41 @@ int Levels::GetIndex(double price)
         }
     }
     return index;
+}
+int Levels::FindNearestLevel(bool isBuyLevel,double price){
+    double distance = 999999999;
+    int index = -1;
+    for (int i = 0; i < length; i++)
+    {
+        Level level = arr[i];
+        if ((!level.isFreeForArr) && (level.isForBuy == isBuyLevel) && level.isForTrade)
+        {
+            double currDistance = MathAbs(level.price - price);
+            if (currDistance < distance)
+            {
+                distance = currDistance;
+                index = i;
+            }
+        }
+    }
+    return index;   
+}
+double Levels::FindNearestLevelDistance(double price){
+    int index = -1;
+    double minDistance = 999999999;
+    for (int i = 0; i < length; i++)
+    {
+        if(arr[i].isFreeForArr)
+        {
+            continue;
+        }
+        double distance = MathAbs(price - arr[i].price);
+        if(distance < minDistance){
+            minDistance = distance;
+            index = i;
+        }
+
+    }
+    return minDistance;
+    
 }

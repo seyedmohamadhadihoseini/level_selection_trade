@@ -11,11 +11,12 @@ void TrackMyOrders(string &StrategyState)
         {
             if (pair.IsTpDone(2))
             {
-                ModifyPositionMarket(pair.ticket1, pair.openPrice, pair.tp1);
-                AllPositions.arr[i].state2 = "end";
+                int factor = pair.type == POSITION_TYPE_BUY ? 1 :-1;
+                ModifyPositionMarket(pair.ticket1, pair.openPrice + factor*riskFreeOffsetPip*10*_Point, pair.tp1);
                 AllPositions.arr[i].state1 = "riskfree";
+                AllPositions.arr[i].state2 = "end";
             }
-            else if (pair.IsSlDone(2))
+            if (pair.IsSlDone(2))
             {
                 StrategyState = "end";
                 AllPositions.Remove(pair.ticket1);
@@ -23,21 +24,18 @@ void TrackMyOrders(string &StrategyState)
         }
         else
         {
+            if (!PositionSelectByTicket(pair.ticket1))
+            {
+                AllPositions.arr[i].state1 = "end";
+                AllPositions.Remove(pair.ticket1);
+            }
             if (pair.state1 == "riskfree")
             {
                 if (pair.IsAlertLevelDone(1, tp1_factor_for_notification))
                 {
                     ModifyPositionMarket(pair.ticket1, pair.tp2, pair.tp1);
-                    SendNotification("price reach to "+(string) tp1_factor_for_notification+(string) " r/r");
+                    SendNotification("price reach to " + (string)tp1_factor_for_notification + (string) " r/r");
                     AllPositions.arr[i].state1 = "trail";
-                }
-            }
-            else if (pair.state1 == "trail")
-            {
-                if (!PositionSelectByTicket(pair.ticket1))
-                {
-                    AllPositions.arr[i].state1 = "end";
-                    AllPositions.Remove(pair.ticket1);
                 }
             }
         }

@@ -21,11 +21,13 @@ int TradeTwoPositions(int index, double risk_percent)
     {
         double price = myBid();
         int slIndex = AllLevels.LevelNextIndex(index, 2);
-        sl = AllLevels.arr[slIndex].price + 50 * _Point;
-        tp1 = price - tp1_factor * (sl - price);
+        sl =  AllLevels.arr[slIndex].price + 50 * _Point;
+        tp1 = NormalizeDouble(price - tp1_factor * (sl - price),_Digits);
         tp2 = price - tp2_PIP *10 * _Point;
         ticket1 = SellMarketWithRiskMoney(riskMoney, sl, tp1);
         ticket2 = SellMarketWithRiskMoney(riskMoney, sl, tp2);
+
     }
-    return AllPositions.AssignNewPosition(ticket1, "start", ticket2, "start");
+    
+    return AllPositions.AssignNewPosition(ticket1, "start", ticket2, "start",risk_percent);
 }

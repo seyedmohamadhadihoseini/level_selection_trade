@@ -8,18 +8,22 @@ input double tp1_factor_for_notification = 1.7;
 input double tp2_PIP = 20;
 Positions AllPositions;
 double one_percent_risk_money = 0;
-int CurrentPositionIndex = -1;
-int SecondPositionIndex = -1;
+PairPosition ActivePositions ;
+// int CurrentPositionIndex = -1;  
+// int SecondPositionIndex = -1;
+bool isSecondPositionHasMoreRisk = false;
+
 void RunStrategy()
 {
     static string StrategyState = "free";
+
     TrackMyOrders(StrategyState);
     
     if (!PreProcessReadyToNext(StrategyState))
     {     
         return;
     }
-
+    
     if(StrategyState == "free"){
         FreeStep(StrategyState);
     }else if(StrategyState == "start1"){

@@ -1,22 +1,25 @@
-#include "./position.mq5";
+#include "position.mq5";
 
 class Positions
 {
 private:
 public:
-    Position arr[200];
+    Position arr[2000];
     int length;
     Positions();
     ~Positions();
-    int AssignNewPosition(ulong ticket1, string initialState1, ulong ticket2, string initialState2);
+    int AssignNewPosition(ulong ticket1, string initialState1, ulong ticket2, string initialState2, double riskPercent);
     void RemoveAll();
     int DataLength();
+    int DataLength(string state);
     void Remove(ulong ticket1);
+    int GetFirstPositionIndex();
+    int GetFirstPositionIndex(string state);
 };
 
 Positions::Positions()
 {
-    length = 200;
+    length = 2000;
 }
 Positions::~Positions()
 {
@@ -34,13 +37,30 @@ int Positions::DataLength()
     }
     return count;
 }
-int Positions::AssignNewPosition(ulong ticket1, string initialState1 , ulong ticket2, string initialState2)
+int Positions::DataLength(string state)
+{
+    int count = 0;
+    for (int i = 0; i < length; i++)
+    {
+        Position position = arr[i];
+        if (!(position.isFreeForArr))
+        {
+            if (position.GetLastestState() == state)
+            {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+int Positions::AssignNewPosition(ulong ticket1, string initialState1, ulong ticket2, string initialState2, double riskPercent)
 {
     for (int i = 0; i < length; i++)
     {
         if (arr[i].isFreeForArr)
         {
             arr[i].Init(ticket1, initialState1, ticket2, initialState2);
+            arr[i].riskPercent = riskPercent;
             arr[i].isFreeForArr = false;
             return i;
         }
@@ -65,3 +85,33 @@ void Positions::Remove(ulong ticket1)
         }
     }
 }
+int Positions::GetFirstPositionIndex()
+{
+    int result = -1;
+    for (int i = 0; i < length; i++)
+    {
+        if (!(arr[i].isFreeForArr))
+        {
+            result = i;
+            break;
+        }
+    }
+    return result;
+}
+int Positions::GetFirstPositionIndex(string state)
+{
+    int result = -1;
+    for (int i = 0; i < length; i++)
+    {
+        if (!(arr[i].isFreeForArr))
+        {
+            if (arr[i].GetLastestState() == state)
+            {
+                result = i;
+                break;
+            }
+        }
+    }
+    return result;
+}
+#include  "pair.mq5";

@@ -25,15 +25,16 @@ public:
     void Show();
     void Remove();
     bool IsTouched();
+    bool IsTouched(double tprice);
 };
 
 void Level::Init(double _price, string _type)
 {
     price = _price;
     type = _type;
-    name = (string)price;
+    name = "lv_" + (string)price;
     isFreeForArr = false;
-    isForBuy = type == "level_buy" || type=="level_lastbuy";
+    isForBuy = type == "level_buy" || type == "level_lastbuy";
     isForTrade = type == "level_buy" || type == "level_sell";
 }
 void Level::Show()
@@ -55,28 +56,31 @@ void Level::Show()
         HLineCreate(0, name, 0, price, C'221,72,72');
     }
 }
-bool Level::IsTouched()
+bool Level::IsTouched(double tprice)
 {
     bool result = false;
-    double currentPrice;
     if (isForBuy)
     {
-        currentPrice = myAsk();
-        if (currentPrice - (telorance_pip * _Point) <= price)
+
+        if (tprice - (telorance_pip * 10 * _Point) <= price)
         {
             result = true;
         }
     }
     else
     {
-        currentPrice = myBid();
-        if (currentPrice + (telorance_pip * _Point) >= price)
+
+        if (tprice + (telorance_pip * 10 * _Point) >= price)
         {
             result = true;
         }
     }
 
     return result;
+}
+bool Level::IsTouched()
+{
+    return IsTouched(isForBuy ? myBid() : myAsk());
 }
 void Level::Remove()
 {

@@ -1,4 +1,5 @@
 #include "./time.mq5";
+#include "InitState.mq5";
 bool PreProcessReadyToNext(string &StrategyState)
 {
     static int timeState = 0;
@@ -8,7 +9,6 @@ bool PreProcessReadyToNext(string &StrategyState)
         if (timeState == 1)
         {
             AllLevels.RemoveAll();
-            AllPositions.RemoveAll();
             timeState = 0;
         }
         if (TradeState == "start")
@@ -24,16 +24,23 @@ bool PreProcessReadyToNext(string &StrategyState)
                 }
             }
         }
-        StrategyState = "free";
-        one_percent_risk_money = AccountInfoDouble(ACCOUNT_BALANCE)*0.01;
+        
+        one_percent_risk_money = AccountInfoDouble(ACCOUNT_BALANCE) * 0.01;
+        return false;
+    }else if(IsInSleepTime()){
         return false;
     }
     else
     {
+        if (timeState == 0)
+        {
+            DetermineInitState(StrategyState);
+            PRINT(StrategyState);
+        }
         timeState = 1;
         if (StrategyState == "end")
         {
-            AllLevels.RemoveAll();
+            // AllLevels.RemoveAll();
             return false;
         }
         return true;
