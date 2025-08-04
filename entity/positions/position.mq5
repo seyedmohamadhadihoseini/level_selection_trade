@@ -30,11 +30,14 @@ public:
     void Remove();
     bool IsTpDone(int index);
     bool IsSlDone(int index);
+    bool IsTpReached(int index);
     bool IsRiskFreeDone(int index);
     double GetProfit(int index);
     string GetLastestState();
     bool DoRiskFree(int index);
+    bool CanRiskFreeDone(int index);
     bool IsOpen(int index);
+    bool CloseManually(int index);
     bool IsAlertLevelDone(int index, double factor);
 };
 
@@ -80,6 +83,15 @@ bool Position::IsTpDone(int index)
     }
     return ((!PositionSelectByTicket(ticket)) && (FindProfitOfClosedPosition(ticket) > 0));
 }
+bool Position::IsTpReached(int index)
+{
+    double tp = tp1;
+    if (index == 2)
+    {
+        tp = tp2;
+    }
+    return isForBuy ? myAsk() >= tp : myBid() <= tp;
+}
 bool Position::IsSlDone(int index)
 {
     ulong ticket = ticket1;
@@ -90,6 +102,33 @@ bool Position::IsSlDone(int index)
 
     return ((!PositionSelectByTicket(ticket)) && (FindProfitOfClosedPosition(ticket) < 0));
 }
+bool Position::CanRiskFreeDone(int index)
+{
+    bool result = false;
+    ulong ticket = ticket1;
+    if (index == 2)
+    {
+        ticket = ticket2;
+    }
+    int factor = isForBuy ? 1 : -1;
+    double offsetPrice = factor * riskFreeOffsetPip * 10 * _Point;
+    double riskFreePrice = openPrice + offsetPrice;
+
+    double price = isForBuy ? myBid() : myAsk();
+    if (isForBuy)
+    {
+        if (price >= riskFreePrice)
+            result = true;
+    }
+    else
+    {
+        if (price <= riskFreePrice)
+        {
+            result = true;
+        }
+    }
+    return result;
+}
 bool Position::IsRiskFreeDone(int index)
 {
     ulong ticket = ticket1;
@@ -98,14 +137,20 @@ bool Position::IsRiskFreeDone(int index)
         ticket = ticket2;
     }
     bool result = false;
-    if(PositionSelectByTicket(ticket)){
+    if (PositionSelectByTicket(ticket))
+    {
         double sl = PositionGetDouble(POSITION_SL);
-        if(type == POSITION_TYPE_BUY){
-            if(sl >= openPrice){
+        if (type == POSITION_TYPE_BUY)
+        {
+            if (sl >= openPrice)
+            {
                 result = true;
             }
-        }else{
-            if(sl <= openPrice){
+        }
+        else
+        {
+            if (sl <= openPrice)
+            {
                 result = true;
             }
         }
@@ -143,7 +188,8 @@ bool Position::IsAlertLevelDone(int index, double factor)
     }
     return false;
 }
-double Position::GetProfit(int index){
+double Position::GetProfit(int index)
+{
     ulong ticket = ticket1;
     if (index == 2)
     {
@@ -153,7 +199,8 @@ double Position::GetProfit(int index){
     double profit = FindProfitOfPosition(ticket);
     return profit;
 }
-bool Position::IsOpen(int index){
+bool Position::IsOpen(int index)
+{
     ulong ticket = ticket1;
     if (index == 2)
     {
@@ -189,23 +236,35 @@ string Position::GetLastestState()
 
     return state;
 }
-bool Position::DoRiskFree(int index){
+bool Position::DoRiskFree(int index)
+{
     ulong ticket = ticket1;
     double tp = tp1;
     if (index == 2)
     {
         ticket = ticket2;
-        tp= tp2;
+        tp = tp2;
     }
-    int factor = type == POSITION_TYPE_BUY ? 1 :-1;
-    bool result = ModifyPositionMarket(ticket, openPrice + factor*riskFreeOffsetPip*10*_Point, tp);
-    if(!result){
+    int factor = type == POSITION_TYPE_BUY ? 1 : -1;
+    bool result = ModifyPositionMarket(ticket, openPrice + factor * riskFreeOffsetPip * 10 * _Point, tp);
+    if (!result)
+    {
         Print("error in risk free with offset");
         result = ModifyPositionMarket(ticket, openPrice, tp);
-        if(result){
+        if (result)
+        {
             Print("but risk free done without it");
         }
     }
 
     return result;
+}
+bool Position::CloseManually(int index)
+{
+    ulong ticket = ticket1;
+    if (index == 2)
+    {
+        ticket = ticket2;
+    }
+    return ClosePosition(ticket);
 }

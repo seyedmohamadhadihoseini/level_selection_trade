@@ -11,7 +11,7 @@ ulong SellMarketWithRiskMoney(double risk_money, double sl, double tp)
 {
     double sl_point = (sl - myBid()) / _Point;
     double volume = CalculateVolume(sl_point, risk_money);
-    PRINT(risk_money);
+    
     return SellMarket(volume, sl, tp);
 }
 ulong BuyMarket(double volume, double sl, double tp)
@@ -29,6 +29,10 @@ ulong SellMarket(double volume, double sl, double tp)
 bool ModifyPositionMarket(ulong ticket, double sl, double tp)
 {
     return cTrade.PositionModify(ticket, sl, tp);
+}
+bool ClosePosition(ulong ticket)
+{
+    return cTrade.PositionClose(ticket);
 }
 double CalculateVolume(double sl_points, double riskMoney)
 {

@@ -13,11 +13,13 @@ void DisconnectionHandler()
         }
 
         IsNowConnected = true;
+        IsDisconnectionHandlerEnd = false;
     }
     else if (IsNowConnected)
     {
         IsNowConnected = false;
         Sleep(200);
         RecoverLevelsAndPositionsAfterDisconnection(DisconnectionTime);
+        IsDisconnectionHandlerEnd = true;
     }
 }

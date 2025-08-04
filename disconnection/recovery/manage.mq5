@@ -7,13 +7,13 @@ void ManageRecoverOnePosition()
         bool isTp2Done = position.IsTpDone(2);
         if (isTp2Done)
         {
-            double profit1 = position.GetProfit(1);
-            if (profit1 > 0)
+            // double profit = position.GetProfit(1);CanRiskFreeDone
+            if (position.CanRiskFreeDone(1))
             {
-                position.DoRiskFree(1);
-            }
-            else
-            {
+                if (!position.DoRiskFree(1))
+                {
+                    position.CloseManually(1);
+                }
             }
         }
     }
@@ -25,14 +25,26 @@ void ManageRecoverTwoPosition()
 
     Position bigPosition = AllPositions.arr[biggerIndex];
     Position lowPosition = AllPositions.arr[lowerIndex];
-    bool isTp2DoneLowPosition = lowPosition.IsTpDone(2);
-    if(isTp2DoneLowPosition){
-        double profit = lowPosition.GetProfit();
-        if(profit > 0){
-            lowPosition.DoRiskFree(1);
-        }else{
+    bool isLowPositionTp2Done = lowPosition.IsTpDone(2);
+    bool isBigPositionTp2Done = bigPosition.IsTpDone(2);
+    if (isLowPositionTp2Done)
+    {
+        if (lowPosition.CanRiskFreeDone(1))
+        {
+            if (!lowPosition.DoRiskFree(1))
+            {
+                lowPosition.CloseManually(1);
+            }
         }
-    }else{
-        return;
+    }
+    if (isBigPositionTp2Done)
+    {
+        if (bigPosition.CanRiskFreeDone(1))
+        {
+            if (bigPosition.DoRiskFree(1))
+            {
+                bigPosition.CloseManually(1);
+            }
+        }
     }
 }

@@ -33,15 +33,16 @@ int PairPosition::GetBiggerPosition(Positions& positions){
     return result;
 }
 int PairPosition::GetLowerPosition(Positions& positions){
-    int result;
+    int result = -1;
     int index = GetBiggerPosition(positions);
     if(index == -1){
         result = -1;
     }else if(index == Position1Index){
         result = (Position2Index == -1)?Position1Index:Position2Index;
     }else if(index == Position2Index){
-        result = Position2Index;
+        result = Position1Index;
     }
+    return result;
 }
 int PairPosition::Length(Positions& positions)
 {

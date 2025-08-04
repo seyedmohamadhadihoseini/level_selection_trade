@@ -135,6 +135,7 @@ int Levels::LevelNextIndex(int currentIndex, int stepFromHere)
             Print("levels are not complete by user ");
             ExpertRemove();
         }
+        PRINT(i);
         if (!(arr[i].isFreeForArr))
         {
             count++;

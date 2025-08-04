@@ -14,7 +14,8 @@ void RemoveTouchedLevels(int shiftCandle)
             }
             if (level.IsTouched(high) || level.IsTouched(low))
             {
-                level.Remove();
+                AllLevels.arr[i].Remove();
+                Print("remove level in disconnection time , level price:",level.price);
             }
         }
     }

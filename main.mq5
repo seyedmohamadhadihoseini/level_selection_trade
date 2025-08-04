@@ -16,7 +16,7 @@ input double order_lowerrisk = 0.5;
 input double riskFreeOffsetPip = 3;
 input double levels_minimum_distance_pip = 22;
 
-string TradeState = "start";
+string TradeState = "stop";
 
 TradeForm mainForm;
 Levels AllLevels;
@@ -31,14 +31,16 @@ void OnChartEvent(const int id, const long &lparam, const double &dparam, const 
 {
     OnChartEventPanel(id, lparam, dparam, sparam);
 }
+bool IsDisconnectionHandlerEnd = true;
 void OnTick()
 {
-    if (TradeState == "stop")
+    if (TradeState == "stop" && (!IsDisconnectionHandlerEnd))
     {
         return;
     }
-    TestAppInit();
+ //   TestAppInit();
     RunStrategy();
+    RiskFreeLostPositionInDisconnection();
 }
 void OnDeinit(const int reason)
 {
